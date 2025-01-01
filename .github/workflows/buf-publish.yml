@@ -59,7 +59,7 @@ jobs:
       - name: Authenticate with Buf
         env:
           BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
-        run: buf registry login --token $BUF_TOKEN
+        run: buf registry login --token-stdin $BUF_TOKEN
 
       - name: Publish to Buf
         env:
