@@ -18,11 +18,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Buf CLI
-        uses: bufbuild/buf-setup-action@v1
+        uses: bufbuild/buf-setup-action@v2
         with:
-          version: 1.x
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          version: v1.48  # Specify the exact version you want to use
 
       - name: Lint Protobuf files
         run: buf lint
@@ -41,14 +39,14 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Buf CLI
-        uses: bufbuild/buf-setup-action@v1
+        uses: bufbuild/buf-setup-action@v2
         with:
-          version: 1.x
+          version: v1.48  # Specify the exact version you want to use
 
-      - name: Authenticate with Buf
-        env:
-          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
-        run: buf registry login --token $BUF_TOKEN
+      - name: Write Buf Token to Config
+        run: |
+          mkdir -p ~/.config/buf
+          echo "{\"token\":\"${{ secrets.BUF_TOKEN }}\"}" > ~/.config/buf/credentials.json
 
       - name: Publish to Buf
         run: buf push
