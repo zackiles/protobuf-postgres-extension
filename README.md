@@ -1,8 +1,6 @@
 # Protobuf-Postgres-Extension
 
-**A Protobuf extension for annotating `.proto` files with PostgreSQL-specific metadata, enabling seamless schema generation and improving consistency between application and database layers.**
-
----
+A Protobuf extension for annotating `.proto` files with PostgreSQL-specific metadata, enabling seamless schema generation and improving consistency between application and database layers.
 
 ## **Features**
 - Annotate Protobuf messages with PostgreSQL-specific metadata for:
@@ -11,8 +9,6 @@
   - **Advanced PostgreSQL features**: Generated columns, exclusion constraints, deferrable constraints.
 - Automate PostgreSQL schema generation using Protobuf tools.
 - Maintain alignment between application data models and database schemas.
-
----
 
 ## **Installation**
 1. Clone the repository or download the `postgres_options.proto` file.
@@ -26,8 +22,6 @@
    module:
      name: buf.build/your-username/protobuf-postgres-extension
    ```
-
----
 
 ## **Usage**
 
@@ -56,8 +50,6 @@ message User {
 
 ### **Full Example**
 Check the `examples/` directory for a complete example using all supported annotations.
-
----
 
 ## **Supported PostgreSQL Annotations**
 
@@ -114,8 +106,6 @@ This extension supports the following PostgreSQL-specific annotations, grouped b
 | `on_delete`          | Specifies the action on delete (e.g., `CASCADE`, `SET NULL`).                               |
 | `on_update`          | Specifies the action on update (e.g., `CASCADE`, `SET NULL`).                               |
 
----
-
 ## **Generated PostgreSQL Schema**
 
 The above `.proto` file generates the following PostgreSQL DDL:
@@ -126,8 +116,6 @@ CREATE TABLE public.users (
   email VARCHAR(255) UNIQUE
 );
 ```
-
----
 
 ## **Development**
 
@@ -158,20 +146,14 @@ protobuf-postgres-extension/
    buf push
    ```
 
----
-
 ## **Contributing**
 Contributions are welcome! To contribute:
 1. Fork the repository.
 2. Create a feature branch.
 3. Submit a pull request with a detailed description of your changes.
 
----
-
 ## **License**
 This project is licensed under the MIT License. See `LICENSE` for details.
-
----
 
 ## **Contact**
 For questions, suggestions, or support, open an issue on the GitHub repository.

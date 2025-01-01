@@ -56,10 +56,12 @@ jobs:
         with:
           version: 1.48.0  # Specify the Buf CLI version
 
-      - name: Write Buf Token to Config
-        run: |
-          mkdir -p ~/.config/buf
-          echo "{\"token\":\"${{ secrets.BUF_TOKEN }}\"}" > ~/.config/buf/credentials.json
+      - name: Authenticate with Buf
+        env:
+          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+        run: buf registry login --token $BUF_TOKEN
 
       - name: Publish to Buf
+        env:
+          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
         run: buf push
