@@ -1,6 +1,16 @@
-version: v1
-
+# buf.gen.yaml
+version: v2
+managed:
+  enabled: true
 plugins:
-  - name: doc
-    out: docs
-    opt: markdown,docs.md
+  # Go plugin for generating Go code
+  - remote: buf.build/protocolbuffers/go:v1.36.1
+    out: gen/go
+    opt:
+      - paths=source_relative
+
+  # TypeScript plugin for generating TypeScript code
+  - remote: buf.build/bufbuild/es:v2.2.3
+    out: gen/ts
+    opt:
+      - target=ts

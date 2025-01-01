@@ -1,0 +1,89 @@
+name: Buf CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+
+jobs:
+  test:
+    name: Lint and Test Buf
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+  
+      - name: Install protoc-gen-doc
+        run: |
+          go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Install Protobuf Compiler (protoc)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+          protoc --version
+
+      - name: Debug Directory Structure
+        run: ls -R proto
+  
+      - name: Generate Protobuf Docs
+        run: |
+          mkdir -p docs
+          protoc \
+            --proto_path=proto \
+            --doc_out=docs \
+            --doc_opt=markdown,docs.md \
+            $(find proto/postgres_extension -name "*.proto")
+
+
+      - name: Buf Build Lint Format and Breaking Test
+        uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          input: "proto"
+          breaking: true
+          lint: true
+          format: true
+
+  publish:
+    name: Publish to Buf Schema Registry
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Buf and Build
+        uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          input: "proto"
+          setup_only: true
+      - run: buf build --error-format=github-actions
+      
+      - name: Publish to Buf
+        uses: bufbuild/buf-action@v1
+        with:
+          push: true
