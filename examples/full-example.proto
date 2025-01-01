@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package postgres.v1;
+
+import "buf.build/zackiles/postgres-extension/postgres/v1/postgres_options.proto";
+
+message User {
+  option (postgres.v1.table_properties) = {
+    table_name: "users"
+    schema: "public"
+    properties: {"autovacuum_enabled": "true"}
+    indexes: [
+      {
+        name: "idx_email"
+        columns: ["email"]
+        index_type: INDEX_TYPE_BTREE
+        unique: true
+      },
+      {
+        name: "idx_created_at"
+        columns: ["created_at"]
+        index_type: INDEX_TYPE_GIN
+        where_clause: "created_at > now() - interval '1 year'"
+      }
+    ]
+    partitioning: {
+      type: TYPE_RANGE
+      keys: ["created_at"]
+    }
+    grants: [
+      { privilege: "SELECT", role: "user_role" },
+      { privilege: "INSERT", role: "admin_role" }
+    ]
+    exclusions: [
+      {
+        name: "exclusion_constraint_example"
+        expression: "excluded_column"
+        operator: "WITH &&"
+        index_type: INDEX_TYPE_GIST
+      }
+    ]
+  };
+
+  int32 id = 1 [
+    (postgres.v1.column_properties) = {
+      column_type: "SERIAL",
+      constraints: [COLUMN_CONSTRAINT_PRIMARY_KEY]
+    },
+    (postgres.v1.advanced_column_properties) = {
+      generated_column: false,
+      identity_column: true,
+      deferrable: true,
+      initially_deferred: false
+    }
+  ];
+
+  string email = 2 [
+    (postgres.v1.column_properties) = {
+      column_type: "VARCHAR(255)",
+      constraints: [COLUMN_CONSTRAINT_UNIQUE, COLUMN_CONSTRAINT_NOT_NULL],
+      default_value: "''"
+    }
+  ];
+
+  string password = 3 [
+    (postgres.v1.column_properties) = {
+      column_type: "TEXT",
+      constraints: [COLUMN_CONSTRAINT_NOT_NULL]
+    }
+  ];
+
+  string created_at = 4 [
+    (postgres.v1.column_properties) = {
+      column_type: "TIMESTAMP",
+      default_value: "CURRENT_TIMESTAMP"
+    }
+  ];
+
+  int32 department_id = 5 [
+    (postgres.v1.column_properties) = {
+      column_type: "INTEGER",
+      foreign_key: "departments(id)",
+      on_delete: FOREIGN_KEY_ACTION_CASCADE,
+      on_update: FOREIGN_KEY_ACTION_RESTRICT
+    }
+  ];
+}
+
+message Department {
+  option (postgres.v1.table_properties) = {
+    table_name: "departments"
+    schema: "public"
+    properties: {"autovacuum_enabled": "true"}
+  };
+
+  int32 id = 1 [
+    (postgres.v1.column_properties) = {
+      column_type: "SERIAL",
+      constraints: [COLUMN_CONSTRAINT_PRIMARY_KEY]
+    }
+  ];
+
+  string name = 2 [
+    (postgres.v1.column_properties) = {
+      column_type: "VARCHAR(255)",
+      constraints: [COLUMN_CONSTRAINT_UNIQUE, COLUMN_CONSTRAINT_NOT_NULL]
+    }
+  ];
+}
