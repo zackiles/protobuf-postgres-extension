@@ -41,14 +41,17 @@ jobs:
           sudo apt-get install -y protobuf-compiler
           protoc --version
 
+      - name: Debug Directory Structure
+        run: ls -R
+  
       - name: Generate Protobuf Docs
         run: |
           mkdir -p docs
           protoc \
-            --proto_path=proto/postgres_extension \
+            --proto_path=proto \
             --doc_out=docs \
             --doc_opt=markdown,docs.md \
-            proto/postgres_extension/*.proto
+            $(find proto/postgres_extension -name "*.proto")
 
 
       - name: Buf Build Lint Format and Breaking Test
