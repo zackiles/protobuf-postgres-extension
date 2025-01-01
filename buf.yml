@@ -1,0 +1,19 @@
+version: v2
+name: buf.build/zackiles/postgres-extension
+
+build:
+  roots:
+    - postgres/v1
+
+lint:
+  use:
+    - DEFAULT
+
+breaking:
+  use:
+    - FILE
+
+plugins:
+  - name: buf.build/bufbuild/docgen
+    out: docs
+    opt: markdown

@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package postgres.v1;
+
+import "google/protobuf/descriptor.proto";
+
+// =============================
+// Table-Level Properties
+// =============================
+message TableProperties {
+  string table_name = 1; // PostgreSQL table name.
+  string schema = 2; // Schema for the table.
+  map<string, string> properties = 3; // General table properties (e.g., autovacuum settings).
+  repeated IndexDefinition indexes = 4; // Table indexes.
+  Partitioning partitioning = 5; // Partitioning details.
+  repeated Grant grants = 6; // Permissions or grants for the table.
+  repeated ExclusionConstraint exclusions = 7; // Exclusion constraints.
+}
+
+extend google.protobuf.MessageOptions {
+  TableProperties table_properties = 50000; // Custom table properties.
+}
+
+// =============================
+// Index Definition
+// =============================
+message IndexDefinition {
+  string name = 1; // Index name.
+  repeated string columns = 2; // Columns included in the index.
+  string expression = 3; // Expression for expression-based indexes.
+  IndexType index_type = 4; // Index type.
+  bool unique = 5; // Unique index.
+  string where_clause = 6; // Partial index condition.
+}
+
+// =============================
+// Index Type Enum
+// =============================
+enum IndexType {
+  INDEX_TYPE_UNSPECIFIED = 0;
+  INDEX_TYPE_BTREE = 1;
+  INDEX_TYPE_GIN = 2;
+  INDEX_TYPE_GIST = 3;
+  INDEX_TYPE_HASH = 4;
+}
+
+// =============================
+// Partitioning Definition
+// =============================
+message Partitioning {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_RANGE = 1;
+    TYPE_HASH = 2;
+    TYPE_LIST = 3;
+  }
+  Type type = 1; // Partitioning type.
+  repeated string keys = 2; // Partitioning keys.
+}
+
+// =============================
+// Permissions and Grants
+// =============================
+message Grant {
+  string privilege = 1; // Privilege type (e.g., SELECT, INSERT).
+  string role = 2; // Role receiving the privilege.
+}
+
+// =============================
+// Exclusion Constraint
+// =============================
+message ExclusionConstraint {
+  string name = 1; // Constraint name.
+  string expression = 2; // Expression or column involved.
+  string operator = 3; // Exclusion operator (e.g., "WITH &&").
+  IndexType index_type = 4; // Index type for the constraint.
+}
+
+// =============================
+// Column-Level Properties
+// =============================
+message ColumnProperties {
+  string column_type = 1; // PostgreSQL data type for the column.
+  repeated ColumnConstraint constraints = 2; // Column constraints (e.g., PRIMARY KEY, NOT NULL).
+  string default_value = 3; // Default value for the column.
+  string foreign_key = 4; // Foreign key reference (table.column).
+  ForeignKeyAction on_delete = 5; // Action on delete.
+  ForeignKeyAction on_update = 6; // Action on update.
+}
+
+extend google.protobuf.FieldOptions {
+  ColumnProperties column_properties = 51000; // Custom column properties.
+}
+
+// =============================
+// Foreign Key Action Enum
+// =============================
+enum ForeignKeyAction {
+  FOREIGN_KEY_ACTION_UNSPECIFIED = 0;
+  FOREIGN_KEY_ACTION_RESTRICT = 1;
+  FOREIGN_KEY_ACTION_CASCADE = 2;
+  FOREIGN_KEY_ACTION_SET_NULL = 3;
+  FOREIGN_KEY_ACTION_SET_DEFAULT = 4;
+}
+
+// =============================
+// Column Constraint Enum
+// =============================
+enum ColumnConstraint {
+  COLUMN_CONSTRAINT_UNSPECIFIED = 0;
+  COLUMN_CONSTRAINT_PRIMARY_KEY = 1;
+  COLUMN_CONSTRAINT_NOT_NULL = 2;
+  COLUMN_CONSTRAINT_UNIQUE = 3;
+  COLUMN_CONSTRAINT_CHECK = 4;
+  COLUMN_CONSTRAINT_FOREIGN_KEY = 5;
+}
+
+// =============================
+// Advanced Properties
+// =============================
+message AdvancedColumnProperties {
+  bool generated_column = 1; // Generated column.
+  bool identity_column = 2; // Identity column.
+  bool deferrable = 3; // Deferrable constraint.
+  bool initially_deferred = 4; // Initially deferred constraint.
+}
+
+extend google.protobuf.FieldOptions {
+  AdvancedColumnProperties advanced_column_properties = 55000; // Advanced properties.
+}
+
+// =============================
+// Composite Type Support
+// =============================
+extend google.protobuf.MessageOptions {
+  bool is_composite_type = 58000; // Marks the message as a composite type.
+}
