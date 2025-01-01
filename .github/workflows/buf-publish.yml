@@ -21,6 +21,8 @@ jobs:
         uses: bufbuild/buf-setup-action@v1
         with:
           version: 1.x
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint Protobuf files
         run: buf lint
