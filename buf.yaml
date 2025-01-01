@@ -1,0 +1,5 @@
+version: v2
+
+modules:
+  - path: .
+    name: buf.build/zackiles/postgres-extension
