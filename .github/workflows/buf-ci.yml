@@ -42,7 +42,7 @@ jobs:
           protoc --version
 
       - name: Debug Directory Structure
-        run: ls -R
+        run: ls -R proto
   
       - name: Generate Protobuf Docs
         run: |
