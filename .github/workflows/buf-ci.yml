@@ -35,6 +35,16 @@ jobs:
           go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
+      - name: Generate Protobuf Docs
+        run: |
+          mkdir -p docs
+          protoc \
+            --proto_path=proto/postgres_extension \
+            --doc_out=docs \
+            --doc_opt=markdown,docs.md \
+            proto/postgres_extension/*.proto
+
+
       - name: Buf Build Lint Format and Breaking Test
         uses: bufbuild/buf-action@v1
         with:

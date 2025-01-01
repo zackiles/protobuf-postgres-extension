@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-package postgres.v1;
+package postgres_extension.v1;
+
+option go_package = "github.com/zackiles/protobuf-postgres-extension/gen/go/postgres_extension/v1";
 
 import "google/protobuf/descriptor.proto";
 
